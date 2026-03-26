@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/876cc0c3f0fc431eb1fb1fde249871e3/artifacts
+end_time: 1774492697102
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 876cc0c3f0fc431eb1fb1fde249871e3
+run_name: redolent-grub-928
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774492697070
+status: 3
+tags: []
+user_id: ezzel
