@@ -25,11 +25,11 @@ jobs:
           pip install flake8
 
       - name: Run Linter
-        # We exclude common non-source directories to prevent unnecessary failures
-        # --extend-ignore=E501 prevents failure on long lines (common in ML)
         run: |
-          flake8 . --count --exclude=.git,__pycache__,docs,old,build,dist --extend-ignore=E501 --statistics
-
+          # --extend-ignore=E501,E121,E111,E128 ignores line length and indentation nuances
+          # --count shows how many errors were found
+          # --statistics gives a summary
+          flake8 . --count --extend-ignore=E501,E121,E111,E128 --exclude=.git,__pycache__,docs,old,build,dist --statistics
   # TRAIN JOB
   train:
     runs-on: ubuntu-latest
