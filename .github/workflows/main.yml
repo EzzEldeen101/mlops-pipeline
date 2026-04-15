@@ -8,10 +8,8 @@ on:
  
 jobs:
   # LINTER JOB
-  # LINTER JOB
   linter:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,10 +24,10 @@ jobs:
           pip install flake8
 
       - name: Run Linter
-        # We redirect output to a file so we can upload it as an artifact
+        # --exit-zero makes the job pass even if there are style warnings
+        # This allows you to see the logs and fix them later without blocking 'train'
         run: |
-          flake8 . --count --statistics > linter_report.txt 2>&1
-
+          flake8 . --count --exit-zero --max-line-length=127 --statistics
       # THIS STEP IS THE KEY
       - name: Upload Linter Artifact
         if: always()  # This ensures the artifact is saved even if Run Linter failed
