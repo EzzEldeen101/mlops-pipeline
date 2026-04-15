@@ -7,11 +7,9 @@ on:
       - "*"
 
 jobs:
-
   # LINTER JOB
   linter:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -23,20 +21,22 @@ jobs:
 
       - name: Install Linter
         run: |
+          python -m pip install --upgrade pip
           pip install flake8
 
       - name: Run Linter
+        # We exclude common non-source directories to prevent unnecessary failures
+        # --extend-ignore=E501 prevents failure on long lines (common in ML)
         run: |
-          flake8 . || exit 1
-
+          flake8 . --count --exclude=.git,__pycache__,docs,old,build,dist --extend-ignore=E501 --statistics
 
   # TRAIN JOB
   train:
     runs-on: ubuntu-latest
-
-    # Gatekeeper Logic
     needs: linter
-    if: >
+    # Simplified logic: if linter passed AND we are on main AND message has tag
+    if: |
+      always() && 
       needs.linter.result == 'success' &&
       github.ref == 'refs/heads/main' &&     
       contains(github.event.head_commit.message, '[run-train]')
@@ -52,19 +52,19 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # Simulate expensive training
       - name: Train Model (GPU Job)
         run: |
           echo "Running expensive training job..."
-          python train.py || exit 1
+          # Ensure train.py exists before running to avoid immediate exit
+          if [ -f train.py ]; then python train.py; else echo "train.py not found"; exit 1; fi
 
       # FAILURE HANDLING
       - name: Save Error Logs
         if: failure()
         run: |
-          echo "Training failed. Check logs." > error_logs.txt
+          echo "Training failed at $(date)" > error_logs.txt
 
       - name: Upload Error Logs
         if: failure()
@@ -73,7 +73,7 @@ jobs:
           name: error-logs
           path: error_logs.txt
 
-      # CLEANUP (ALWAYS RUNS)
+      # CLEANUP
       - name: Cleanup Resources
         if: always()
         run: |
