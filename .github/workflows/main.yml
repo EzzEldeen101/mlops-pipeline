@@ -3,7 +3,7 @@ name: Controlled ML Pipeline
 on:
   push:
     branches:
-      - "*" 
+      - "*"
 
 jobs:
   # LINTER JOB
@@ -22,27 +22,16 @@ jobs:
         run: pip install flake8
 
       - name: Run Linter
-        # Redirecting to file so the artifact upload has a file to grab
+        # We check for syntax errors and common issues
         run: |
-          flake8 . --count --exit-zero --max-line-length=127 --statistics > linter_report.txt
-
-      - name: Upload Linter Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: linter-results
-          path: linter_report.txt
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
   # TRAIN JOB
   train:
     runs-on: ubuntu-latest
     needs: linter
-    # REMOVED the commit message check so it runs every time on main
-    if: |
-      always() && 
-      needs.linter.result == 'success' &&
-      github.ref == 'refs/heads/main'
-
+    if: github.ref == 'refs/heads/main'  # Runs only on the main branch
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -54,15 +43,19 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          pip install mlflow sklearn scikit-learn  # Ensuring these are present
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Train Model (GPU Job)
-        id: train_step
+      - name: Train Model
         run: |
-          echo "Running expensive training job..."
-          # FORCING FAILURE: This ensures the next 'if: failure()' step triggers
-          python train.py || (echo "Training script crashed with exit code $?" > error_logs.txt && exit 1)
+          echo "Starting training job..."
+          python train.py
 
+      - name: Upload Success Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-output
+          path: model_info.txt
       # FAILURE HANDLING
       - name: Upload Error Logs
         if: failure()
