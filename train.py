@@ -4,7 +4,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-# Use a default if the env var isn't set to prevent the script itself from crashing
+# Set tracking URI with a fallback to avoid errors
 tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 mlflow.set_tracking_uri(tracking_uri)
 
@@ -24,6 +24,6 @@ with mlflow.start_run() as run:
     print(f"Run ID: {run_id}")
     print(f"Accuracy: {accuracy}")
 
-    # REQUIRED for pipeline
+    # Create the file required by the next stage of the pipeline
     with open("model_info.txt", "w") as f:
-        f.write(run_id)
+        f.write(str(run_id))
