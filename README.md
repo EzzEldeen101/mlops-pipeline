@@ -1,7 +1,7 @@
-# Machine Learning Project
+# MLOps Pipeline Project
 
 ## Overview
-This project is a machine learning application that implements a model for [insert specific task or problem here, e.g., classification, regression, etc.]. It includes the necessary components for training, evaluating, and making predictions with the model.
+This project implements a Machine Learning CI/CD pipeline using GitHub Actions. It includes validation, training control, and deployment logic using MLOps best practices.
 
 ## Project Structure
 ```
@@ -54,3 +54,6 @@ pytest tests/test_model.py
 
 ## Contribution
 Contributions are welcome! Please submit a pull request or open an issue for any suggestions or improvements.
+=======
+# mlops-pipeline
+>>>>>>> 428dfed999908ddff406d9f0869bda004a738ab8
