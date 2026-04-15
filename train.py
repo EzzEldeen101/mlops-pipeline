@@ -1,12 +1,12 @@
 import mlflow
+import os
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-import os
 
-
-# Ensure the tracking URI is set; added a fallback to avoid NoneType errors
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
+# Use a default if the env var isn't set to prevent the script itself from crashing
+tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
+mlflow.set_tracking_uri(tracking_uri)
 
 with mlflow.start_run() as run:
     run_id = run.info.run_id
