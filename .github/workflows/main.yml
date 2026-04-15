@@ -3,7 +3,7 @@ name: Controlled ML Pipeline
 on:
   push:
     branches:
-      - "*"
+      - "*" 
 
 jobs:
   # LINTER JOB
